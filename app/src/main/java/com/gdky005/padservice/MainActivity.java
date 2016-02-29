@@ -13,10 +13,11 @@ import android.util.Log;
 import android.view.View;
 
 import com.gdky005.padservice.service.PadService;
+import com.gdky005.padservice.utils.ServiceIntent;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
-    String PAD_SERVICE_FLAG = "com.gdky005.PAD_SERVICE";
+    public static final String PAD_SERVICE_FLAG = "com.gdky005.PAD_SERVICE";
 
     ServiceConnection connection;
 
@@ -113,9 +114,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @NonNull
     private Intent getPadIntent() {
-        Intent intent = new Intent(PAD_SERVICE_FLAG);
-        intent.setPackage(getApplicationContext().getPackageName());
-        return intent;
+        return ServiceIntent.getPadIntent(this);
     }
 
     public void log(String message) {

@@ -8,6 +8,9 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 
 /**
+ *
+ * Service 启动对话框 ，需要加系统参数，并在Manifest里面配置对应的权限
+ *
  * Created by WangQing on 16/2/19.
  */
 public class PadService extends Service {
@@ -29,7 +32,9 @@ public class PadService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         log("onStartCommand");
-        return super.onStartCommand(intent, flags, startId);
+
+        //保证服务不被杀死
+        return Service.START_STICKY;
     }
 
     @Override
