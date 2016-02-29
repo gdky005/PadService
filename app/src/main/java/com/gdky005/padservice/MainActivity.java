@@ -32,7 +32,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         connection = new PadServiceConnection();
 
-
     }
 
     private class PadServiceConnection implements ServiceConnection {

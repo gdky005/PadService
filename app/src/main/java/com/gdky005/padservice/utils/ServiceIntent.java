@@ -20,8 +20,7 @@ public class ServiceIntent {
     public static Intent getPadIntent(Context context) {
 
         if (context == null) {
-            PadApplication padApplication = new PadApplication();
-            context = padApplication.context;
+            context = PadApplication.getContext();
         }
 
         Intent intent = new Intent(MainActivity.PAD_SERVICE_FLAG);
