@@ -1,7 +1,6 @@
 package com.gdky005.padservice.service;
 
 import android.app.Service;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.Handler;
@@ -18,7 +17,6 @@ import com.gdky005.padservice.utils.L;
 
 import java.util.Hashtable;
 import java.util.Iterator;
-import java.util.Map;
 
 import okhttp3.Call;
 
@@ -27,12 +25,9 @@ import okhttp3.Call;
  * <p/>
  * Created by WangQing on 16/2/19.
  */
-public class PadService extends Service {
+public class PadService extends BaseService {
 
-    private IBinder mBinder = new PadBinder();
-    private Context context;
-    private KuwoDao kuwoDao;
-    private Map idMaps;
+    public IBinder mBinder = new PadBinder();
 
     private Handler handler = new Handler() {
         @Override
@@ -40,18 +35,6 @@ public class PadService extends Service {
             super.handleMessage(msg);
         }
     };
-
-    @Override
-    public void onCreate() {
-        super.onCreate();
-        log("onCreate");
-    }
-
-    @Override
-    public void onStart(Intent intent, int startId) {
-        super.onStart(intent, startId);
-        log("onStart");
-    }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -82,7 +65,11 @@ public class PadService extends Service {
                 KuwoProgramBean.MusiclistEntity musicEntity = response.getMusiclist().get(0);
                 String name = musicEntity.getName();
                 String albumId = musicEntity.getAlbumid();
-                idMaps.put(name, albumId);
+
+                if (!idMaps.containsKey(albumId)) {
+                    idMaps.put(albumId, musicEntity);
+                }
+
             }
         };
 
@@ -90,23 +77,7 @@ public class PadService extends Service {
             @Override
             public void run() {
 
-                if (idMaps.size() > 0) {
-                    Iterator<String> keys = idMaps.keySet().iterator();
-
-                    while (keys.hasNext()) {
-                        String key = keys.next();
-                        String value = (String) idMaps.get(key);
-                        L.i("获取的音频数据是：" + "键->" + key + ", " + "值->" + value);
-
-                        //得到的数据是：
-//                        I: 获取的音频数据是：键->说一次让你难忘的邂逅(酷我音乐调频Vol.206), 值->161281
-//                        I: 获取的音频数据是：键->你是什么样子，你所看到的世界就是什么样子（莫萱日记2月29日）, 值->531242
-//                        I: 获取的音频数据是：键->小情侣地铁接吻秀恩爱持续7站......(吐小曹扒新闻2月29日), 值->537590
-
-                    }
-
-
-                }
+                getMp3AddressForMap();
             }
         }, 5000);
 
@@ -115,11 +86,28 @@ public class PadService extends Service {
         kuwoDao.getTXCBXWList(programListCallback);
     }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        log("onDestroy");
+    private void getMp3AddressForMap() {
+        if (idMaps.size() > 0) {
+            Iterator<String> keys = idMaps.keySet().iterator();
+
+            while (keys.hasNext()) {
+                String key = keys.next(); // 代表id
+                KuwoProgramBean.MusiclistEntity value = (KuwoProgramBean.MusiclistEntity)
+                        idMaps.get(key); //数据实体
+                L.i("获取的音频数据是：" + "id->" + key + ", " + "数据实体->" + value.getName());
+
+
+                //数据格式是：
+//                        I: 获取的音频数据是：id->537590, 数据实体->小情侣地铁接吻秀恩爱持续7站......(吐小曹扒新闻2月29日)
+//                        I: 获取的音频数据是：id->531242, 数据实体->你是什么样子，你所看到的世界就是什么样子（莫萱日记2月29日）
+//                        I: 获取的音频数据是：id->161281, 数据实体->说一次让你难忘的邂逅(酷我音乐调频Vol.206)
+
+            }
+
+
+        }
     }
+
 
     @Nullable
     @Override
@@ -136,22 +124,6 @@ public class PadService extends Service {
         }
 
         return mIBinder;
-    }
-
-    @Override
-    public boolean stopService(Intent name) {
-        log("onUnbind");
-        return super.stopService(name);
-    }
-
-    @Override
-    public boolean onUnbind(Intent intent) {
-        log("onUnbind");
-        return super.onUnbind(intent);
-    }
-
-    public void log(String message) {
-        Log.i(PadService.class.getSimpleName(), message);
     }
 
     public class PadBinder extends Binder {
