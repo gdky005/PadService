@@ -10,7 +10,6 @@ import android.os.IBinder;
 import android.os.Message;
 import android.os.SystemClock;
 import android.support.annotation.Nullable;
-import android.util.Log;
 import android.widget.Toast;
 
 import com.gdky005.padservice.PadApplication;
@@ -176,7 +175,7 @@ public class PadService extends BaseService {
                 String key = keys.next(); // 代表id
                 KuwoProgramBean.MusiclistEntity value = (KuwoProgramBean.MusiclistEntity)
                         idMaps.get(key); //数据实体
-                L.i("获取的音频数据是：" + "id->" + key + ", " + "数据实体->" + value.getName());
+                L.i("获取的音频数据是：id->{}, 数据实体->{}",  key,  value.getName());
 
 
                 //数据格式是：
@@ -213,7 +212,7 @@ public class PadService extends BaseService {
         String pad_tag = "pad_tag";
 
         public PadService getService() {
-            Log.i("TAG", "getService ---> " + PadService.this);
+            L.i("getService ---> {}",  PadService.class.getSimpleName());
             return PadService.this;
         }
 
