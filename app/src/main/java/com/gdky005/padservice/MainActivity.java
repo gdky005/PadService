@@ -39,14 +39,15 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
         connection = new PadServiceConnection();
 
+        //三剑客 音频
         String mp3UrlSJK = "http://image.kaolafm" +
                 ".net/mz/audios/201603/b860d25b-87e1-4901-9fd1-44ce4ddc6e61.mp3";
-
-        String m3u8UrlZB = "http://ugclbs.kaolafm" +
-                ".com/aaf30a55ec51aa6f/1486224311_1585306448/playlist.m3u8";
-
-        String mp3Url = "http://other.web.rh01.sycdn.kuwo" +
-                ".cn/7abff6cff1ad4ab6f7418ab5dee80b97/56d65047/resource/n3/69/22/26734815.mp3";
+        //某一时刻的直播
+        String m3u8UrlZB = "http://ugclbs.kaolafm.com/aaf30a55ec51aa6f/1403152088_1534064922/playlist.m3u8";
+        //酷音调频 mp3
+        String mp3Url = "http://other.web.rh01.sycdn.kuwo.cn/4e2e51ac77f4b29e60e82141b8216838/56dd74f1/resource/n1/95/36/170925567.mp3";
+        //酷音调频 aar
+        String aarUrl = "http://other.web.rh03.sycdn.kuwo.cn/0895137d37b65e2927054c07a5ed7126/56dd752e/resource/a3/68/48/4079355865.aac";
 
 
 
@@ -63,7 +64,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
         LivePlayerManager mLivePlayerManager = LivePlayerManager.getInstance(this);
 
-        mLivePlayerManager.start(mp3UrlSJK);
+        mLivePlayerManager.start(aarUrl);
 
     }
 
