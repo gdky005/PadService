@@ -1,5 +1,6 @@
 package com.gdky005.padservice;
 
+import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -7,16 +8,14 @@ import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.annotation.NonNull;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 
 import com.gdky005.padservice.service.PadService;
 import com.gdky005.padservice.utils.ServiceIntent;
-import com.kaolafm.mediaplayer.VLCMediaPlayClient;
+import com.kaolafm.live.utils.LivePlayerManager;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+public class MainActivity extends Activity implements View.OnClickListener {
 
     public static final String PAD_SERVICE_FLAG = "com.gdky005.PAD_SERVICE";
 
@@ -35,9 +34,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        setContentView(R.layout.content_main);
+//        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
 
         connection = new PadServiceConnection();
 
@@ -63,13 +61,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 //                0,
 //                false);
 
+        LivePlayerManager mLivePlayerManager = LivePlayerManager.getInstance(this);
+
+        mLivePlayerManager.start(mp3UrlSJK);
 
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        VLCMediaPlayClient.getInstance().unBindVLCPlayService();
+//        VLCMediaPlayClient.getInstance().unBindVLCPlayService();
     }
 
     private class PadServiceConnection implements ServiceConnection {

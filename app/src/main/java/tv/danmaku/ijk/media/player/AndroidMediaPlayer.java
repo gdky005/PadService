@@ -29,6 +29,13 @@ import android.view.SurfaceHolder.Callback;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 
+import tv.danmaku.ijk.media.player.IMediaPlayer.OnBufferingUpdateListener;
+import tv.danmaku.ijk.media.player.IMediaPlayer.OnCompletionListener;
+import tv.danmaku.ijk.media.player.IMediaPlayer.OnErrorListener;
+import tv.danmaku.ijk.media.player.IMediaPlayer.OnInfoListener;
+import tv.danmaku.ijk.media.player.IMediaPlayer.OnPreparedListener;
+import tv.danmaku.ijk.media.player.IMediaPlayer.OnSeekCompleteListener;
+import tv.danmaku.ijk.media.player.IMediaPlayer.OnVideoSizeChangedListener;
 import tv.danmaku.ijk.media.player.pragma.DebugLog;
 
 public class AndroidMediaPlayer extends SimpleMediaPlayer {
@@ -85,7 +92,8 @@ public class AndroidMediaPlayer extends SimpleMediaPlayer {
         mInternalMediaPlayer.setSurface(surface);
     }
 
-    @Override
+   
+	@Override
     public void setDataSource(String path) throws IOException,
             IllegalArgumentException, SecurityException, IllegalStateException {
         mDataSource = path;
@@ -105,16 +113,15 @@ public class AndroidMediaPlayer extends SimpleMediaPlayer {
     }
 
     @Override
-    public void prepare() throws IllegalStateException {
-
-    }
-
-    @Override
     public void prepareAsync() throws IllegalStateException {
         mInternalMediaPlayer.prepareAsync();
     }
+    
+    
 
-    @Override
+ 
+
+	@Override
     public void start() throws IllegalStateException {
         mInternalMediaPlayer.start();
     }

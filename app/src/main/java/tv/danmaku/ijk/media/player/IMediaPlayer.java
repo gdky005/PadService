@@ -54,9 +54,9 @@ public interface IMediaPlayer {
 
     public abstract String getDataSource();
 
-    public abstract void prepare() throws IllegalStateException;
-
     public abstract void prepareAsync() throws IllegalStateException;
+    
+    //public abstract void setDataCallBack(long flag) throws  IllegalStateException;
 
     public abstract void start() throws IllegalStateException;
 
