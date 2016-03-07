@@ -14,6 +14,7 @@ import android.view.View;
 
 import com.gdky005.padservice.service.PadService;
 import com.gdky005.padservice.utils.ServiceIntent;
+import com.kaolafm.mediaplayer.VLCMediaPlayClient;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -22,6 +23,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     ServiceConnection connection;
 
     PadService padService;
+
+//    static {
+//        System.loadLibrary("kaolafmffmpeg");
+//        System.loadLibrary("kaolafmutil");
+//        System.loadLibrary("kaolafmsdl");
+//        System.loadLibrary("kaolafmplayer");
+//    }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,11 +41,34 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         connection = new PadServiceConnection();
 
+        String mp3UrlSJK = "http://image.kaolafm" +
+                ".net/mz/audios/201603/b860d25b-87e1-4901-9fd1-44ce4ddc6e61.mp3";
+
+        String m3u8UrlZB = "http://ugclbs.kaolafm" +
+                ".com/aaf30a55ec51aa6f/1486224311_1585306448/playlist.m3u8";
+
         String mp3Url = "http://other.web.rh01.sycdn.kuwo" +
                 ".cn/7abff6cff1ad4ab6f7418ab5dee80b97/56d65047/resource/n3/69/22/26734815.mp3";
 
 
+//        VLCMediaPlayClient.getInstance().bindVLCPlayService(
+//                getApplicationContext());
+//
+//
+//        VLCMediaPlayClient.getInstance().sendPlayURLToService(m3u8UrlZB,
+//                "测试标题",
+//                0,
+//                0,
+//                0,
+//                false);
 
+
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        VLCMediaPlayClient.getInstance().unBindVLCPlayService();
     }
 
     private class PadServiceConnection implements ServiceConnection {
