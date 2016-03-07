@@ -51,6 +51,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 ".cn/7abff6cff1ad4ab6f7418ab5dee80b97/56d65047/resource/n3/69/22/26734815.mp3";
 
 
+
 //        VLCMediaPlayClient.getInstance().bindVLCPlayService(
 //                getApplicationContext());
 //
