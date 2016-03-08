@@ -12,8 +12,11 @@ import com.gdky005.padservice.dao.bean.KuwoBean;
 import com.gdky005.padservice.utils.AlarmUtils;
 import com.gdky005.padservice.utils.KuwoDataUtils;
 import com.gdky005.padservice.utils.L;
+import com.kaolafm.live.utils.LivePlayerManager;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -23,8 +26,10 @@ import java.util.Map;
  */
 public class PadService extends BaseService {
 
+    private LivePlayerManager mLivePlayerManager;
     private KuwoDataUtils kuwoDataUtils;
     private Map mp3Map;
+    private List mp3List;
 
     private Handler handler = new Handler();
     public IBinder mBinder = new PadBinder();
@@ -33,6 +38,8 @@ public class PadService extends BaseService {
     public int onStartCommand(Intent intent, int flags, int startId) {
         log("onStartCommand");
         context = PadApplication.getContext();
+        mLivePlayerManager = LivePlayerManager.getInstance(this);
+        mp3List = new ArrayList();
 
         AlarmUtils.startAlarm(context, 0, 0);
 
@@ -60,8 +67,18 @@ public class PadService extends BaseService {
 
                         L.i("酷我音频数据是：programId->{}, 节目id->{}, 音频->{}",
                                 programId, albumId, url);
+
+                        //对酷我音频的id进行个性化排序
+//                        for (int i = 0; i < KuwoProgramEmnu.values().length; i++) {
+//                            if (KuwoProgramEmnu.values()[i].toString().equals(programId))
+//                                mp3List.add(KuwoProgramEmnu.values()[i].ordinal(), kuwoBean);
+//                        }
+//
+//                        L.i("测试{}", mp3List.toArray().toString());
                     }
                 }
+
+                mLivePlayerManager.playM3U8();
             }
         }, 10000);
 
