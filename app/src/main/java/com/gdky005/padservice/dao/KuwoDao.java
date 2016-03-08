@@ -46,11 +46,12 @@ public class KuwoDao extends BaseDao {
      * @param id
      * @param callback
      */
-    public void getProgramData(String id, Callback callback) {
+    public void getProgramData(String programId, String id, Callback callback) {
         String url = RequestApi.KUWO_AUDIO_DATA_URL;
 
         GetBuilder builder = new GetBuilder()
                 .url(url)
+                .addParams("programId", programId)
                 .addParams("mid", id)
                 .addParams("format", FORMAT_FIELD);
 

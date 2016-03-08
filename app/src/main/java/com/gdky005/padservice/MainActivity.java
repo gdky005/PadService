@@ -13,7 +13,6 @@ import android.view.View;
 
 import com.gdky005.padservice.service.PadService;
 import com.gdky005.padservice.utils.ServiceIntent;
-import com.kaolafm.live.utils.LivePlayerManager;
 
 public class MainActivity extends Activity implements View.OnClickListener {
 
@@ -49,22 +48,8 @@ public class MainActivity extends Activity implements View.OnClickListener {
         //酷音调频 aar
         String aarUrl = "http://other.web.rh03.sycdn.kuwo.cn/0895137d37b65e2927054c07a5ed7126/56dd752e/resource/a3/68/48/4079355865.aac";
 
-
-
-//        VLCMediaPlayClient.getInstance().bindVLCPlayService(
-//                getApplicationContext());
-//
-//
-//        VLCMediaPlayClient.getInstance().sendPlayURLToService(m3u8UrlZB,
-//                "测试标题",
-//                0,
-//                0,
-//                0,
-//                false);
-
-        LivePlayerManager mLivePlayerManager = LivePlayerManager.getInstance(this);
-
-        mLivePlayerManager.start(aarUrl);
+//        LivePlayerManager mLivePlayerManager = LivePlayerManager.getInstance(this);
+//        mLivePlayerManager.start(mp3UrlSJK);
 
     }
 

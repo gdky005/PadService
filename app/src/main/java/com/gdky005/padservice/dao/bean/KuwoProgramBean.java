@@ -315,5 +315,47 @@ public class KuwoProgramBean {
         public String getScore100() {
             return score100;
         }
+
+        @Override
+        public String toString() {
+            return "{" +
+                    "album:'" + album + '\'' +
+                    ", albumid:'" + albumid + '\'' +
+                    ", artist:'" + artist + '\'' +
+                    ", artistid:'" + artistid + '\'' +
+                    ", copyright:'" + copyright + '\'' +
+                    ", duration:'" + duration + '\'' +
+                    ", formats:'" + formats + '\'' +
+                    ", hasmv:'" + hasmv + '\'' +
+                    ", id:'" + id + '\'' +
+                    ", is_point:'" + is_point + '\'' +
+                    ", muti_ver:'" + muti_ver + '\'' +
+                    ", name:'" + name + '\'' +
+                    ", online:'" + online + '\'' +
+                    ", params:'" + params + '\'' +
+                    ", pay:'" + pay + '\'' +
+                    ", score100:'" + score100 + '\'' +
+                    '}';
+        }
+    }
+
+    @Override
+    public String toString() {
+        return "{" +
+                "id:" + id +
+                ", info:'" + info + '\'' +
+                ", ispub:" + ispub +
+                ", pic:'" + pic + '\'' +
+                ", pn:" + pn +
+                ", result:'" + result + '\'' +
+                ", rn:" + rn +
+                ", tag:'" + tag + '\'' +
+                ", title:'" + title + '\'' +
+                ", total:" + total +
+                ", type:'" + type + '\'' +
+                ", uid:" + uid +
+                ", uname:'" + uname + '\'' +
+                ", musiclist:" + musiclist +
+                '}';
     }
 }

@@ -13,6 +13,8 @@ public class KuwoDataBean {
 
     private String url;
     private String isok;
+    private String programId;
+    private String mid;
 
     public void setUrl(String url) {
         this.url = url;
@@ -28,5 +30,31 @@ public class KuwoDataBean {
 
     public String getIsok() {
         return isok;
+    }
+
+    public String getProgramId() {
+        return programId;
+    }
+
+    public void setProgramId(String programId) {
+        this.programId = programId;
+    }
+
+    public String getMid() {
+        return mid;
+    }
+
+    public void setMid(String mid) {
+        this.mid = mid;
+    }
+
+    @Override
+    public String toString() {
+        return "{" +
+                "isok:'" + isok + '\'' +
+                ", url:'" + url + '\'' +
+                ", programId:'" + programId + '\'' +
+                ", mid:'" + mid + '\'' +
+                '}';
     }
 }
