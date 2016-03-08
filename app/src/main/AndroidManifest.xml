@@ -36,6 +36,7 @@
         </activity>
 
         <service android:name="com.kaolafm.mediaplayer.VLCMediaPlayService"/>
+        <service android:name="com.kaolafm.mediaplayer.PlayerService"/>
 
         <service android:name=".service.PadService">
             <intent-filter>

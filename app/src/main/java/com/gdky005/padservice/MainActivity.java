@@ -1,22 +1,23 @@
 package com.gdky005.padservice;
 
+import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.os.RemoteException;
 import android.support.annotation.NonNull;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 
 import com.gdky005.padservice.service.PadService;
 import com.gdky005.padservice.utils.ServiceIntent;
-import com.kaolafm.mediaplayer.VLCMediaPlayClient;
+import com.kaolafm.mediaplayer.PlayItem;
+import com.kaolafm.mediaplayer.PlayerService;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+public class MainActivity extends Activity implements View.OnClickListener {
 
     public static final String PAD_SERVICE_FLAG = "com.gdky005.PAD_SERVICE";
 
@@ -24,32 +25,35 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     PadService padService;
 
-//    static {
-//        System.loadLibrary("kaolafmffmpeg");
-//        System.loadLibrary("kaolafmutil");
-//        System.loadLibrary("kaolafmsdl");
-//        System.loadLibrary("kaolafmplayer");
-//    }
+    String mp3UrlSJK;
+    String m3u8UrlZB;
+    String mp3Url;
+
+    static {
+        System.loadLibrary("kaolafmutil");
+        System.loadLibrary("kaolafmsdl");
+        System.loadLibrary("kaolafmffmpeg");
+        System.loadLibrary("kaolafmplayer");
+    }
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        setContentView(R.layout.content_main);
+//        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+//        setSupportActionBar(toolbar);
 
         connection = new PadServiceConnection();
 
-        String mp3UrlSJK = "http://image.kaolafm" +
+        mp3UrlSJK = "http://image.kaolafm" +
                 ".net/mz/audios/201603/b860d25b-87e1-4901-9fd1-44ce4ddc6e61.mp3";
 
-        String m3u8UrlZB = "http://ugclbs.kaolafm" +
+        m3u8UrlZB = "http://ugclbs.kaolafm" +
                 ".com/aaf30a55ec51aa6f/1486224311_1585306448/playlist.m3u8";
 
-        String mp3Url = "http://other.web.rh01.sycdn.kuwo" +
+        mp3Url = "http://other.web.rh01.sycdn.kuwo" +
                 ".cn/7abff6cff1ad4ab6f7418ab5dee80b97/56d65047/resource/n3/69/22/26734815.mp3";
-
 
 
 //        VLCMediaPlayClient.getInstance().bindVLCPlayService(
@@ -63,13 +67,71 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 //                0,
 //                false);
 
+//        bindService();
+
 
     }
+
+    private void bindService() {
+        bindService(new Intent(this, PlayerService.class),
+                this.mPlayerServiceConnection, Context.BIND_AUTO_CREATE);
+    }
+
+    PlayerService.PlayerBinder mPlayerBinder;
+
+    private ServiceConnection mPlayerServiceConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName componentName,
+                                       IBinder iBinder) {
+            if (iBinder instanceof PlayerService.PlayerBinder) {
+                mPlayerBinder = (PlayerService.PlayerBinder) iBinder;
+            }
+
+
+            try {
+                PlayItem playItem = new PlayItem();
+                playItem.setPlayUrl(mp3UrlSJK);
+                mPlayerBinder.start(playItem);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+//            try {
+//                mPlayerBinder.addPlayerStateListener(mPlayerStateListener);
+//                for (int i = 0, size = mUnAddedPlayerStateListeners.size(); i < size; i++) {
+//                    PlayerService.IPlayerStateListener listener = mUnAddedPlayerStateListeners.get(i);
+//                    if (listener == null) {
+//                        continue;
+//                    }
+//                    mPlayerBinder.addPlayerStateListener(listener);
+//                }
+////                for (PlayerService.IPlayerStateListener listener : mUnAddedPlayerStateListeners) {
+////                    mPlayerBinder.addPlayerStateListener(listener);
+////                }
+//                mUnAddedPlayerStateListeners.clear();
+//            } catch (Throwable e) {
+//                e.printStackTrace();
+//                logger.error("Add player state listener error.");
+//            }
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName componentName) {
+//            PlayerBroadcastRadioManager playerBroadcastRadioManager = PlayerBroadcastRadioManager.getInstance(mContext);
+//            playerBroadcastRadioManager.removePlayerStateListener(playerBroadcastRadioManager.getPlayerStateListener());
+//            try {
+//                mPlayerBinder.removePlayerStateListener(mPlayerStateListener);
+//            } catch (Throwable e) {
+//                e.printStackTrace();
+//                logger.error("Remove player state listener error.");
+//            }
+            mPlayerBinder = null;
+        }
+    };
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        VLCMediaPlayClient.getInstance().unBindVLCPlayService();
+//        VLCMediaPlayClient.getInstance().unBindVLCPlayService();
     }
 
     private class PadServiceConnection implements ServiceConnection {
