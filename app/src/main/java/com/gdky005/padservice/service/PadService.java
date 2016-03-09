@@ -113,17 +113,17 @@ public class PadService extends BaseService {
 
         if (mp3BeanMap != null) {
             KuwoBean kuwoBean = (KuwoBean) mp3BeanMap.get(currentProgram++);
-            mLivePlayerManager.addLiveEndListener(new LivePlayerManager.OnLiveEndListener() {
-                @Override
-                public void onLiveEnd() {
-                    if (currentProgram <= mp3BeanMap.size()) {
-                        KuwoBean bean = (KuwoBean) mp3BeanMap.get(currentProgram);
-                        String playUrl = bean.getUrl();
-                        playMusic(playUrl);
+            if (kuwoBean != null) {
+                mLivePlayerManager.addLiveEndListener(new LivePlayerManager.OnLiveEndListener() {
+                    @Override
+                    public void onLiveEnd() {
+                        if (currentProgram <= mp3BeanMap.size()) {
+                            playMusic();
+                        }
                     }
-                }
-            });
-            playMusic(kuwoBean.getUrl());
+                });
+                playMusic(kuwoBean.getUrl());
+            }
         }
     }
 
