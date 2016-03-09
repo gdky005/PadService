@@ -9,14 +9,14 @@ import android.support.annotation.Nullable;
 
 import com.gdky005.padservice.PadApplication;
 import com.gdky005.padservice.dao.bean.KuwoBean;
+import com.gdky005.padservice.emnu.KuwoProgramEmnu;
 import com.gdky005.padservice.utils.AlarmUtils;
 import com.gdky005.padservice.utils.KuwoDataUtils;
 import com.gdky005.padservice.utils.L;
 import com.kaolafm.live.utils.LivePlayerManager;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -29,7 +29,7 @@ public class PadService extends BaseService {
     private LivePlayerManager mLivePlayerManager;
     private KuwoDataUtils kuwoDataUtils;
     private Map mp3Map;
-    private List mp3List;
+    private Map mp3BeanList;
 
     private Handler handler = new Handler();
     public IBinder mBinder = new PadBinder();
@@ -39,7 +39,7 @@ public class PadService extends BaseService {
         log("onStartCommand");
         context = PadApplication.getContext();
         mLivePlayerManager = LivePlayerManager.getInstance(this);
-        mp3List = new ArrayList();
+        mp3BeanList = new HashMap();
 
         AlarmUtils.startAlarm(context, 0, 0);
 
@@ -69,16 +69,19 @@ public class PadService extends BaseService {
                                 programId, albumId, url);
 
                         //对酷我音频的id进行个性化排序
-//                        for (int i = 0; i < KuwoProgramEmnu.values().length; i++) {
-//                            if (KuwoProgramEmnu.values()[i].toString().equals(programId))
-//                                mp3List.add(KuwoProgramEmnu.values()[i].ordinal(), kuwoBean);
-//                        }
+                        for (int i = 0; i < KuwoProgramEmnu.values().length; i++) {
+                            if (KuwoProgramEmnu.values()[i].toString().equals(programId)){
+                                mp3BeanList.put(KuwoProgramEmnu.values()[i].ordinal(), kuwoBean);
+                                break;
+                            }
+                        }
 //
-//                        L.i("测试{}", mp3List.toArray().toString());
+                        L.i("测试{}", mp3BeanList.toString());
                     }
                 }
 
-                mLivePlayerManager.playM3U8();
+                KuwoBean kuwoBean = (KuwoBean) mp3BeanList.get(0);
+                mLivePlayerManager.start(kuwoBean.getUrl());
             }
         }, 10000);
 
