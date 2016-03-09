@@ -9,11 +9,15 @@ import android.support.annotation.Nullable;
 
 import com.gdky005.padservice.PadApplication;
 import com.gdky005.padservice.dao.bean.KuwoBean;
+import com.gdky005.padservice.dao.bean.KuwoProgramBean;
 import com.gdky005.padservice.emnu.KuwoProgramEmnu;
 import com.gdky005.padservice.utils.AlarmUtils;
 import com.gdky005.padservice.utils.KuwoDataUtils;
 import com.gdky005.padservice.utils.L;
 import com.kaolafm.live.utils.LivePlayerManager;
+
+import org.simple.eventbus.EventBus;
+import org.simple.eventbus.Subscriber;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -28,66 +32,136 @@ public class PadService extends BaseService {
 
     private LivePlayerManager mLivePlayerManager;
     private KuwoDataUtils kuwoDataUtils;
-    private Map mp3Map;
-    private Map mp3BeanList;
+    private Map mp3BeanMap;
+
+    private int requestCount = 0;
+    private int mp3Count = 0;
+    private int currentProgram = 0;
 
     private Handler handler = new Handler();
     public IBinder mBinder = new PadBinder();
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        EventBus.getDefault().register(this);
+    }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         log("onStartCommand");
         context = PadApplication.getContext();
         mLivePlayerManager = LivePlayerManager.getInstance(this);
-        mp3BeanList = new HashMap();
+        mp3BeanMap = new HashMap();
+
+        requestCount = 0;
+        mp3Count = 0;
+        currentProgram = 0;
 
         AlarmUtils.startAlarm(context, 0, 0);
 
-
         kuwoDataUtils = new KuwoDataUtils(context);
-
         kuwoDataUtils.initRequestData();
-
-        //6秒后获取已经获取的音频数据列表
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-
-                mp3Map = kuwoDataUtils.getMp3Map();
-
-
-                if (mp3Map.size() > 0) {
-                    Iterator<String> keys = mp3Map.keySet().iterator();
-
-                    while (keys.hasNext()) {
-                        String programId = keys.next(); // 代表id
-                        KuwoBean kuwoBean = (KuwoBean) mp3Map.get(programId);
-                        String albumId = kuwoBean.getMid(); // 代表id
-                        String url = kuwoBean.getUrl();
-
-                        L.i("酷我音频数据是：programId->{}, 节目id->{}, 音频->{}",
-                                programId, albumId, url);
-
-                        //对酷我音频的id进行个性化排序
-                        for (int i = 0; i < KuwoProgramEmnu.values().length; i++) {
-                            if (KuwoProgramEmnu.values()[i].toString().equals(programId)){
-                                mp3BeanList.put(KuwoProgramEmnu.values()[i].ordinal(), kuwoBean);
-                                break;
-                            }
-                        }
-//
-                        L.i("测试{}", mp3BeanList.toString());
-                    }
-                }
-
-                KuwoBean kuwoBean = (KuwoBean) mp3BeanList.get(0);
-                mLivePlayerManager.start(kuwoBean.getUrl());
-            }
-        }, 10000);
-
 
         //保证服务不被杀死
         return Service.START_STICKY;
+    }
+
+    /**
+     * 从并发的请求里面获取 对应真实的音频地址
+     *
+     * @param musiclistEntity
+     */
+    @Subscriber(tag = KuwoDataUtils.ONE_NOTIFICATION_ONCE_REQUEST_FLAG)
+    public void getRequestData(KuwoProgramBean musiclistEntity) {
+        if (requestCount <= KuwoProgramEmnu.values().length) {
+
+            if (KuwoProgramEmnu.values().length == requestCount) {
+                kuwoDataUtils.getMp3AddressForMap();
+                return;
+            }
+
+            ++requestCount;
+        } else {
+            requestCount = 0;
+        }
+
+    }
+
+    @Subscriber(tag = KuwoDataUtils.ONE_NOTIFICATION_FOR_ONCE_MUSIC_DATA_FLAG)
+    public void getMp3Map(KuwoBean kuwoBean) {
+
+        if (mp3Count <= KuwoProgramEmnu.values().length) {
+
+            if (KuwoProgramEmnu.values().length == mp3Count) {
+                playMusic();
+                return;
+            }
+
+            ++mp3Count;
+        } else {
+            mp3Count = 0;
+        }
+
+    }
+
+    /**
+     * 开始逐个播放音乐
+     */
+    private void playMusic() {
+        mp3BeanMap = sortMp3Address();
+
+        if (mp3BeanMap != null) {
+            KuwoBean kuwoBean = (KuwoBean) mp3BeanMap.get(currentProgram++);
+            mLivePlayerManager.addLiveEndListener(new LivePlayerManager.OnLiveEndListener() {
+                @Override
+                public void onLiveEnd() {
+                    if (currentProgram <= mp3BeanMap.size()) {
+                        KuwoBean bean = (KuwoBean) mp3BeanMap.get(currentProgram);
+                        String playUrl = bean.getUrl();
+                        playMusic(playUrl);
+                    }
+                }
+            });
+            playMusic(kuwoBean.getUrl());
+        }
+    }
+
+    private void playMusic(String url) {
+        mLivePlayerManager.start(url);
+    }
+
+    private Map sortMp3Address() {
+        Map mp3Map = kuwoDataUtils.getMp3Map();
+
+        L.i("你的mp3Map大小是：{}", mp3Map.size());
+
+        if (mp3Map.size() > 0) {
+            Iterator<String> keys = mp3Map.keySet().iterator();
+
+            while (keys.hasNext()) {
+                String programId = keys.next(); // 代表id
+                KuwoBean kuwoBean = (KuwoBean) mp3Map.get(programId);
+                String albumId = kuwoBean.getMid(); // 代表id
+                String url = kuwoBean.getUrl();
+
+                L.i("酷我音频数据是：programId->{}, 节目id->{}, 音频->{}",
+                        programId, albumId, url);
+
+                //对酷我音频的id进行个性化排序
+                for (int i = 0; i < KuwoProgramEmnu.values().length; i++) {
+                    if (KuwoProgramEmnu.values()[i].toString().equals(programId)) {
+                        mp3BeanMap.put(KuwoProgramEmnu.values()[i].ordinal(), kuwoBean);
+                        break;
+                    }
+                }
+//
+                L.i("测试{}", mp3BeanMap.toString());
+
+                return mp3BeanMap;
+            }
+        }
+        return null;
     }
 
     @Nullable
@@ -107,12 +181,18 @@ public class PadService extends BaseService {
         return mIBinder;
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        EventBus.getDefault().unregister(this);
+    }
+
     public class PadBinder extends Binder {
 
         String pad_tag = "pad_tag";
 
         public PadService getService() {
-            L.i("getService ---> {}",  PadService.class.getSimpleName());
+            L.i("getService ---> {}", PadService.class.getSimpleName());
             return PadService.this;
         }
 

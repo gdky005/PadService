@@ -25,7 +25,7 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
         KuwoDao kuwoDao = new KuwoDao();
 
 
-        kuwoDao.getProgramData("6941263", new ProgramMusicDataCallback() {
+        kuwoDao.getProgramData("6941263", "6941263", new ProgramMusicDataCallback() {
             @Override
             public void onError(Call call, Exception e) {
                 System.out.println("发生错误了：" + e.getMessage());

@@ -1,8 +1,6 @@
 package com.gdky005.padservice.utils;
 
 import android.content.Context;
-import android.os.Handler;
-import android.os.Message;
 
 import com.gdky005.padservice.dao.KuwoDao;
 import com.gdky005.padservice.dao.bean.KuwoBean;
@@ -10,6 +8,8 @@ import com.gdky005.padservice.dao.bean.KuwoDataBean;
 import com.gdky005.padservice.dao.bean.KuwoProgramBean;
 import com.gdky005.padservice.dao.callback.ProgramListCallback;
 import com.gdky005.padservice.dao.callback.ProgramMusicDataCallback;
+
+import org.simple.eventbus.EventBus;
 
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -22,32 +22,13 @@ import okhttp3.Call;
  */
 public class KuwoDataUtils {
 
-    public static final int DATA_SUCCESS = 0;
-
-    private boolean isFirstRequestData = true;
+    public static final String ONE_NOTIFICATION_ONCE_REQUEST_FLAG = "ONE_NOTIFICATION_ONCE_REQUEST_FLAG";
+    public static final String ONE_NOTIFICATION_FOR_ONCE_MUSIC_DATA_FLAG = "one_notification_for_once_music_data_flag";
 
     public Map idMaps;
     public Map mp3Map;
     public KuwoDao kuwoDao;
     public Context context;
-
-    private Handler handler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            super.handleMessage(msg);
-            switch (msg.what) {
-                case DATA_SUCCESS:
-                    handler.postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            getMp3AddressForMap();
-                        }
-                    }, 5000);
-
-                    break;
-            }
-        }
-    };
 
     public KuwoDataUtils(Context context) {
         this.context = context;
@@ -55,8 +36,6 @@ public class KuwoDataUtils {
         kuwoDao = new KuwoDao();
         idMaps = new Hashtable();
         mp3Map = new Hashtable();
-
-        isFirstRequestData = true;
 
         initRequestData();
     }
@@ -83,10 +62,8 @@ public class KuwoDataUtils {
                     idMaps.put(name, musicEntity);
                 }
 
-                if (isFirstRequestData) {
-                    handler.sendEmptyMessage(DATA_SUCCESS);
-                    isFirstRequestData = false;
-                }
+
+                EventBus.getDefault().post(response, ONE_NOTIFICATION_ONCE_REQUEST_FLAG);
             }
         };
 
@@ -95,7 +72,8 @@ public class KuwoDataUtils {
         kuwoDao.getTXCBXWList(programListCallback);
     }
 
-    private void getMp3AddressForMap() {
+    public void getMp3AddressForMap() {
+        L.i("发起请求：idMaps->{}",idMaps.size());
         if (idMaps.size() > 0) {
             Iterator<String> keys = idMaps.keySet().iterator();
 
@@ -115,6 +93,7 @@ public class KuwoDataUtils {
     }
 
     private void requestProgramData(String programId, KuwoProgramBean.MusiclistEntity musiclistEntity) {
+        L.i("发起请求：programId->{}",programId);
         kuwoDao.getProgramData(programId, musiclistEntity.getId(), new ProgramMusicDataCallback() {
             @Override
             public void onError(Call call, Exception e) {
@@ -139,6 +118,8 @@ public class KuwoDataUtils {
                 kuwoBean.setUrl(url);
 
                 mp3Map.put(programId, kuwoBean);
+
+                EventBus.getDefault().post(kuwoBean, ONE_NOTIFICATION_FOR_ONCE_MUSIC_DATA_FLAG);
 
 //                        03-08 18:59:48.562 I: ║ 当前获取的音频: mid->6958190, programe->1013437787, 地址是：http://other.web.rh01.sycdn.kuwo.cn/f743cf9dfd8b5c7926d3cb8fa417713b/56deb09e/resource/n1/94/66/3900324722.mp3
 //                        03-08 18:59:48.565 I: ║ 当前获取的音频: mid->6951198, programe->1013437783, 地址是：http://other.web.rh01.sycdn.kuwo.cn/42c666014fca3adbb9f0131eb4699d12/56deb09e/resource/n1/9/6/248073288.mp3
