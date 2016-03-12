@@ -12,7 +12,11 @@ import android.util.Log;
 import android.view.View;
 
 import com.gdky005.padservice.service.PadService;
+import com.gdky005.padservice.utils.AlarmUtils;
+import com.gdky005.padservice.utils.L;
 import com.gdky005.padservice.utils.ServiceIntent;
+
+import java.text.SimpleDateFormat;
 
 public class MainActivity extends Activity implements View.OnClickListener {
 
@@ -21,14 +25,6 @@ public class MainActivity extends Activity implements View.OnClickListener {
     ServiceConnection connection;
 
     PadService padService;
-
-//    static {
-//        System.loadLibrary("kaolafmffmpeg");
-//        System.loadLibrary("kaolafmutil");
-//        System.loadLibrary("kaolafmsdl");
-//        System.loadLibrary("kaolafmplayer");
-//    }
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,6 +46,30 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
 //        LivePlayerManager mLivePlayerManager = LivePlayerManager.getInstance(this);
 //        mLivePlayerManager.start(mp3UrlSJK);
+
+        long time = System.currentTimeMillis();
+        SimpleDateFormat formatH = new SimpleDateFormat("HH");
+        SimpleDateFormat formatM = new SimpleDateFormat("mm");
+        SimpleDateFormat formatS = new SimpleDateFormat("ss");
+        int h = Integer.parseInt(formatH.format(time));
+        int m = Integer.parseInt(formatM.format(time));
+        int s = Integer.parseInt(formatS.format(time));
+
+        if (s == 56) {
+            s = 55;
+        }
+
+        if (m == 60) {
+            m = 0;
+        }
+
+
+//        L.i("当前的时间是：{}时{}分{}秒", h, m, s);
+//        s+=5;
+        s++;
+        L.i("当前的设置闹钟时间是：{}时{}分{}秒", h, m, s);
+        AlarmUtils.startAlarm(this, 60 * 1000, h, m, s);
+
 
     }
 

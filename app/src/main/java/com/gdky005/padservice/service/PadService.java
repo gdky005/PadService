@@ -11,7 +11,6 @@ import com.gdky005.padservice.PadApplication;
 import com.gdky005.padservice.dao.bean.KuwoBean;
 import com.gdky005.padservice.dao.bean.KuwoProgramBean;
 import com.gdky005.padservice.emnu.KuwoProgramEmnu;
-import com.gdky005.padservice.utils.AlarmUtils;
 import com.gdky005.padservice.utils.KuwoDataUtils;
 import com.gdky005.padservice.utils.L;
 import com.kaolafm.live.utils.LivePlayerManager;
@@ -58,7 +57,7 @@ public class PadService extends BaseService {
         mp3Count = 0;
         currentProgram = 0;
 
-        AlarmUtils.startAlarm(context, 0, 0);
+//        AlarmUtils.startAlarm(context, 0, 0);
 
         kuwoDataUtils = new KuwoDataUtils(context);
         kuwoDataUtils.initRequestData();
@@ -128,7 +127,7 @@ public class PadService extends BaseService {
     }
 
     private void playMusic(String url) {
-        mLivePlayerManager.start(url);
+//        mLivePlayerManager.start(url);
     }
 
     private Map sortMp3Address() {

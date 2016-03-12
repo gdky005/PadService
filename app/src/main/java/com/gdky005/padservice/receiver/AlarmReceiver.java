@@ -18,10 +18,10 @@ import com.gdky005.padservice.utils.L;
 public class AlarmReceiver extends BroadcastReceiver {
 
     private NotificationManager manager;
+    int i = 0;
 
     @Override
     public void onReceive(Context context, Intent intent) {
-
         L.i("收到闹钟提醒了");
 
         long time = System.currentTimeMillis();
@@ -33,7 +33,8 @@ public class AlarmReceiver extends BroadcastReceiver {
         Intent playIntent = new Intent(context, MainActivity.class);
         playIntent.putExtra("id", id);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, String.valueOf(time).hashCode(), playIntent,
-                PendingIntent.FLAG_UPDATE_CURRENT);
+                PendingIntent.FLAG_ONE_SHOT);
+//                PendingIntent.FLAG_UPDATE_CURRENT);
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
         builder.setContentTitle("title：" + context.getString(R.string.app_name))
                 .setContentText("提醒时间:" + time)
@@ -42,7 +43,7 @@ public class AlarmReceiver extends BroadcastReceiver {
                 .setContentIntent(pendingIntent)
                 .setAutoCancel(true)
                 .setSubText("包名：" + context
-                .getPackageName());
+                        .getPackageName());
         manager.notify(1, builder.build());
     }
 }
