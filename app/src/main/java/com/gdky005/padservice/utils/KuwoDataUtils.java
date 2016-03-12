@@ -36,8 +36,6 @@ public class KuwoDataUtils {
         kuwoDao = new KuwoDao();
         idMaps = new Hashtable();
         mp3Map = new Hashtable();
-
-        initRequestData();
     }
 
     public void initRequestData() {

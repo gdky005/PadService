@@ -29,6 +29,9 @@ public class MainActivity extends Activity implements View.OnClickListener {
 //        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
 
         connection = new PadServiceConnection();
+
+        bind();
+        start();
     }
 
     private class PadServiceConnection implements ServiceConnection {

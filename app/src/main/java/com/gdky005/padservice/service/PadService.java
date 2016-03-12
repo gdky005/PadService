@@ -51,12 +51,13 @@ public class PadService extends BaseService {
         EventBus.getDefault().register(this);
 
         AlarmUtils.cancelAlarm(this);
-        AlarmUtils.startAlarm(this, 60*1000, 12, 7, 0);
+//        AlarmUtils.startAlarm(this, 60*1000, 12, 7, 0);
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         log("onStartCommand");
+        kuwoDataUtils = new KuwoDataUtils(context);
 
         requestCount = 0;
         mp3Count = 0;
@@ -65,6 +66,9 @@ public class PadService extends BaseService {
         context = PadApplication.getContext();
         mLivePlayerManager = LivePlayerManager.getInstance(this);
         mp3BeanMap = new HashMap();
+
+
+        preparePlayMusic(true);
 
 //        testPlayData();
 
@@ -88,8 +92,7 @@ public class PadService extends BaseService {
     }
 
     @Subscriber(tag = NOTIFICATION_SUCCESS_PLAY_MUSIC_FLAG)
-    private void playMusic(boolean isPlay) {
-        kuwoDataUtils = new KuwoDataUtils(context);
+    private synchronized void preparePlayMusic(boolean isPlay) {
         kuwoDataUtils.initRequestData();
     }
 
@@ -101,15 +104,13 @@ public class PadService extends BaseService {
      * @param musiclistEntity
      */
     @Subscriber(tag = KuwoDataUtils.ONE_NOTIFICATION_ONCE_REQUEST_FLAG)
-    public void getRequestData(KuwoProgramBean musiclistEntity) {
+    public synchronized void getRequestData(KuwoProgramBean musiclistEntity) {
         if (requestCount <= KuwoProgramEmnu.values().length) {
 
-            if (KuwoProgramEmnu.values().length == requestCount) {
+            if (KuwoProgramEmnu.values().length == ++requestCount) {
                 kuwoDataUtils.getMp3AddressForMap();
                 return;
             }
-
-            ++requestCount;
         } else {
             requestCount = 0;
         }
@@ -117,16 +118,14 @@ public class PadService extends BaseService {
     }
 
     @Subscriber(tag = KuwoDataUtils.ONE_NOTIFICATION_FOR_ONCE_MUSIC_DATA_FLAG)
-    public void getMp3Map(KuwoBean kuwoBean) {
+    public synchronized void getMp3Map(KuwoBean kuwoBean) {
 
         if (mp3Count <= KuwoProgramEmnu.values().length) {
 
-            if (KuwoProgramEmnu.values().length == mp3Count) {
+            if (KuwoProgramEmnu.values().length == ++mp3Count) {
                 playMusic();
                 return;
             }
-
-            ++mp3Count;
         } else {
             mp3Count = 0;
         }
@@ -139,22 +138,23 @@ public class PadService extends BaseService {
     private void playMusic() {
         mp3BeanMap = sortMp3Address();
 
-        if (mp3BeanMap != null && mp3BeanMap.size() <= currentProgram) {
-            KuwoBean kuwoBean = (KuwoBean) mp3BeanMap.get(currentProgram++);
-            if (kuwoBean != null && TextUtils.isEmpty(kuwoBean.getUrl())) {
+        if (mp3BeanMap != null && mp3BeanMap.size() >= ++currentProgram) {
+            KuwoBean kuwoBean = (KuwoBean) mp3BeanMap.get(currentProgram);
+            if (kuwoBean != null && !TextUtils.isEmpty(kuwoBean.getUrl())) {
                 mLivePlayerManager.addLiveEndListener(new LivePlayerManager.OnLiveEndListener() {
                     @Override
                     public void onLiveEnd() {
-                        if (currentProgram <= mp3BeanMap.size()) {
-                            playMusic();
-                        }
+                        playMusic();
                     }
                 });
                 playMusic(kuwoBean.getUrl());
             } else {
+                mLivePlayerManager.reset();
                 L.i("播放列表已经播完");
             }
         } else {
+            mLivePlayerManager.reset();
+            currentProgram = 0;
             L.i("播放声音的列表为null，或是播放列表已经播完");
         }
     }
@@ -187,11 +187,9 @@ public class PadService extends BaseService {
                         break;
                     }
                 }
-//
-                L.i("测试{}", mp3BeanMap.toString());
-
-                return mp3BeanMap;
             }
+            L.i("测试{}", mp3BeanMap.toString());
+            return mp3BeanMap;
         }
         return null;
     }
