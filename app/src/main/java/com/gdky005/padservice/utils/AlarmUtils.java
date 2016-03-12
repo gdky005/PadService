@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.SystemClock;
 
+import com.gdky005.padservice.dao.bean.TimeBean;
 import com.gdky005.padservice.receiver.AlarmReceiver;
 
 import java.util.Calendar;
@@ -19,11 +20,21 @@ public class AlarmUtils {
 
     /**
      * 启动定时循环闹钟
+     *
+     */
+    public static void startAlarm(Context context, TimeBean timeBean) {
+        startAlarm(context, timeBean.getIntervalMillis(), timeBean.getHour(), timeBean.getMinute(),
+                timeBean.getSecond());
+    }
+
+    /**
+     * 启动定时循环闹钟
+     *
      * @param context
-     * @param intervalMillis    每次循环间隔的时间,毫秒为单位
-     * @param hour  定时的小时
-     * @param minute    定时的分钟
-     * @param second    定时的秒
+     * @param intervalMillis 每次循环间隔的时间,毫秒为单位
+     * @param hour           定时的小时
+     * @param minute         定时的分钟
+     * @param second         定时的秒
      */
     public static void startAlarm(Context context, long intervalMillis, int hour, int minute, int second) {
 //        每天定时执行任务
@@ -63,6 +74,7 @@ public class AlarmUtils {
 
     /**
      * 取消循环闹钟
+     *
      * @param context
      */
     public static void cancelAlarm(Context context) {
@@ -79,8 +91,9 @@ public class AlarmUtils {
 
     /**
      * 设置普通闹钟
-     *
+     * <p/>
      * 仅作参考
+     *
      * @param context
      */
     private void defaultAlarm(Context context) {
@@ -102,8 +115,9 @@ public class AlarmUtils {
 
     /**
      * 取消闹钟
-     *
+     * <p/>
      * 仅作参考
+     *
      * @param mContext
      */
     public static void cancelDefaultAlarm(Context mContext) {

@@ -12,7 +12,6 @@ import com.gdky005.padservice.PadApplication;
 import com.gdky005.padservice.dao.bean.KuwoBean;
 import com.gdky005.padservice.dao.bean.KuwoProgramBean;
 import com.gdky005.padservice.emnu.KuwoProgramEmnu;
-import com.gdky005.padservice.utils.AlarmUtils;
 import com.gdky005.padservice.utils.KuwoDataUtils;
 import com.gdky005.padservice.utils.L;
 import com.kaolafm.live.utils.LivePlayerManager;
@@ -33,6 +32,7 @@ public class PadService extends BaseService {
 
     public static final String NOTIFICATION_SUCCESS_PLAY_MUSIC_FLAG =
             "notification_success_play_music_flag";
+    public static final String TIME_BEAN_FLAG = "time_bean_flag";
 
     private LivePlayerManager mLivePlayerManager;
     private KuwoDataUtils kuwoDataUtils;
@@ -49,9 +49,6 @@ public class PadService extends BaseService {
     public void onCreate() {
         super.onCreate();
         EventBus.getDefault().register(this);
-
-        AlarmUtils.cancelAlarm(this);
-//        AlarmUtils.startAlarm(this, 60*1000, 12, 7, 0);
     }
 
     @Override
