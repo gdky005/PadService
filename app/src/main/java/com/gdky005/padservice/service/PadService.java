@@ -6,11 +6,13 @@ import android.os.Binder;
 import android.os.Handler;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 
 import com.gdky005.padservice.PadApplication;
 import com.gdky005.padservice.dao.bean.KuwoBean;
 import com.gdky005.padservice.dao.bean.KuwoProgramBean;
 import com.gdky005.padservice.emnu.KuwoProgramEmnu;
+import com.gdky005.padservice.utils.AlarmUtils;
 import com.gdky005.padservice.utils.KuwoDataUtils;
 import com.gdky005.padservice.utils.L;
 import com.kaolafm.live.utils.LivePlayerManager;
@@ -29,6 +31,9 @@ import java.util.Map;
  */
 public class PadService extends BaseService {
 
+    public static final String NOTIFICATION_SUCCESS_PLAY_MUSIC_FLAG =
+            "notification_success_play_music_flag";
+
     private LivePlayerManager mLivePlayerManager;
     private KuwoDataUtils kuwoDataUtils;
     private Map mp3BeanMap;
@@ -44,27 +49,51 @@ public class PadService extends BaseService {
     public void onCreate() {
         super.onCreate();
         EventBus.getDefault().register(this);
+
+        AlarmUtils.cancelAlarm(this);
+        AlarmUtils.startAlarm(this, 60*1000, 12, 7, 0);
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         log("onStartCommand");
-        context = PadApplication.getContext();
-        mLivePlayerManager = LivePlayerManager.getInstance(this);
-        mp3BeanMap = new HashMap();
 
         requestCount = 0;
         mp3Count = 0;
         currentProgram = 0;
 
-//        AlarmUtils.startAlarm(context, 0, 0);
+        context = PadApplication.getContext();
+        mLivePlayerManager = LivePlayerManager.getInstance(this);
+        mp3BeanMap = new HashMap();
 
-        kuwoDataUtils = new KuwoDataUtils(context);
-        kuwoDataUtils.initRequestData();
+//        testPlayData();
+
 
         //保证服务不被杀死
         return Service.START_STICKY;
     }
+
+    private void testPlayData() {
+        //三剑客 音频
+        String mp3UrlSJK = "http://image.kaolafm" +
+                ".net/mz/audios/201603/b860d25b-87e1-4901-9fd1-44ce4ddc6e61.mp3";
+        //某一时刻的直播
+        String m3u8UrlZB = "http://ugclbs.kaolafm.com/aaf30a55ec51aa6f/1403152088_1534064922/playlist.m3u8";
+        //酷音调频 mp3
+        String mp3Url = "http://other.web.rh01.sycdn.kuwo.cn/4e2e51ac77f4b29e60e82141b8216838/56dd74f1/resource/n1/95/36/170925567.mp3";
+        //酷音调频 aar
+        String aarUrl = "http://other.web.rh03.sycdn.kuwo.cn/0895137d37b65e2927054c07a5ed7126/56dd752e/resource/a3/68/48/4079355865.aac";
+
+        mLivePlayerManager.start(mp3UrlSJK);
+    }
+
+    @Subscriber(tag = NOTIFICATION_SUCCESS_PLAY_MUSIC_FLAG)
+    private void playMusic(boolean isPlay) {
+        kuwoDataUtils = new KuwoDataUtils(context);
+        kuwoDataUtils.initRequestData();
+    }
+
+
 
     /**
      * 从并发的请求里面获取 对应真实的音频地址
@@ -110,9 +139,9 @@ public class PadService extends BaseService {
     private void playMusic() {
         mp3BeanMap = sortMp3Address();
 
-        if (mp3BeanMap != null) {
+        if (mp3BeanMap != null && mp3BeanMap.size() <= currentProgram) {
             KuwoBean kuwoBean = (KuwoBean) mp3BeanMap.get(currentProgram++);
-            if (kuwoBean != null) {
+            if (kuwoBean != null && TextUtils.isEmpty(kuwoBean.getUrl())) {
                 mLivePlayerManager.addLiveEndListener(new LivePlayerManager.OnLiveEndListener() {
                     @Override
                     public void onLiveEnd() {
@@ -122,12 +151,16 @@ public class PadService extends BaseService {
                     }
                 });
                 playMusic(kuwoBean.getUrl());
+            } else {
+                L.i("播放列表已经播完");
             }
+        } else {
+            L.i("播放声音的列表为null，或是播放列表已经播完");
         }
     }
 
     private void playMusic(String url) {
-//        mLivePlayerManager.start(url);
+        mLivePlayerManager.start(url);
     }
 
     private Map sortMp3Address() {

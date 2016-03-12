@@ -10,7 +10,10 @@ import android.support.v4.app.NotificationCompat;
 
 import com.gdky005.padservice.MainActivity;
 import com.gdky005.padservice.R;
+import com.gdky005.padservice.service.PadService;
 import com.gdky005.padservice.utils.L;
+
+import org.simple.eventbus.EventBus;
 
 /**
  * Created by WangQing on 16/2/29.
@@ -25,6 +28,8 @@ public class AlarmReceiver extends BroadcastReceiver {
         L.i("收到闹钟提醒了");
 
         long time = System.currentTimeMillis();
+
+        EventBus.getDefault().post(true, PadService.NOTIFICATION_SUCCESS_PLAY_MUSIC_FLAG);
 
         manager = (NotificationManager) context.getSystemService(android.content.Context.NOTIFICATION_SERVICE);
         //例如这个id就是你传过来的
