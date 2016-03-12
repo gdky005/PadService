@@ -28,7 +28,7 @@ import java.util.Map;
  * <p/>
  * Created by WangQing on 16/2/19.
  */
-public class PadService extends BaseService {
+public class PadService extends BaseService implements LivePlayerManager.OnLiveEndListener {
 
     public static final String NOTIFICATION_SUCCESS_PLAY_MUSIC_FLAG =
             "notification_success_play_music_flag";
@@ -49,6 +49,7 @@ public class PadService extends BaseService {
     public void onCreate() {
         super.onCreate();
         EventBus.getDefault().register(this);
+        mLivePlayerManager = LivePlayerManager.getInstance(this);
     }
 
     @Override
@@ -61,11 +62,11 @@ public class PadService extends BaseService {
         currentProgram = 0;
 
         context = PadApplication.getContext();
-        mLivePlayerManager = LivePlayerManager.getInstance(this);
+
         mp3BeanMap = new HashMap();
 
 
-        preparePlayMusic(true);
+//        preparePlayMusic(true);
 
 //        testPlayData();
 
@@ -138,12 +139,6 @@ public class PadService extends BaseService {
         if (mp3BeanMap != null && mp3BeanMap.size() >= ++currentProgram) {
             KuwoBean kuwoBean = (KuwoBean) mp3BeanMap.get(currentProgram);
             if (kuwoBean != null && !TextUtils.isEmpty(kuwoBean.getUrl())) {
-                mLivePlayerManager.addLiveEndListener(new LivePlayerManager.OnLiveEndListener() {
-                    @Override
-                    public void onLiveEnd() {
-                        playMusic();
-                    }
-                });
                 playMusic(kuwoBean.getUrl());
             } else {
                 mLivePlayerManager.reset();
@@ -212,6 +207,11 @@ public class PadService extends BaseService {
     public void onDestroy() {
         super.onDestroy();
         EventBus.getDefault().unregister(this);
+    }
+
+    @Override
+    public void onLiveEnd() {
+        playMusic();
     }
 
     public class PadBinder extends Binder {
