@@ -69,7 +69,8 @@ public class AlarmUtils {
 
         L.i("当前设置AlarmUtils启动闹钟的时间是：{}，selectTime={}，systemTime={}，firstTime={}。",
                 time, selectTime, systemTime, firstTime);
-        ToastUtils.showToast(context, "设置重复闹铃成功! ");
+
+        NotifyUtils.showNotify(context, "设置闹钟", "设置重复闹钟成功", "");
     }
 
     /**

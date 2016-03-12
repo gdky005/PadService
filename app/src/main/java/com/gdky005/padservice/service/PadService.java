@@ -14,6 +14,7 @@ import com.gdky005.padservice.dao.bean.KuwoKBean;
 import com.gdky005.padservice.emnu.KuwoProgramEmnu;
 import com.gdky005.padservice.utils.KuwoDataUtils;
 import com.gdky005.padservice.utils.L;
+import com.gdky005.padservice.utils.NotifyUtils;
 import com.kaolafm.live.utils.LivePlayerManager;
 
 import org.simple.eventbus.EventBus;
@@ -143,15 +144,18 @@ public class PadService extends BaseService implements LivePlayerManager.OnLiveE
             } else {
                 mLivePlayerManager.reset();
                 L.i("播放列表已经播完");
+                NotifyUtils.showNotify(context, "暂无播放节目", "无", "");
             }
         } else {
             mLivePlayerManager.reset();
             currentProgram = 0;
+            NotifyUtils.showNotify(context, "今日播放完成", "已经播完", "");
             L.i("播放声音的列表为null，或是播放列表已经播完");
         }
     }
 
     private void playMusic(String url) {
+        NotifyUtils.showNotify(context, "正在播放", "播放音频中", "");
         mLivePlayerManager.start(url);
     }
 
