@@ -3,10 +3,13 @@ package com.gdky005.padservice;
 import android.app.Application;
 import android.test.ApplicationTestCase;
 import android.test.UiThreadTest;
+import android.test.suitebuilder.annotation.LargeTest;
 
 import com.gdky005.padservice.dao.KuwoDao;
 import com.gdky005.padservice.dao.bean.KuwoDataBean;
+import com.gdky005.padservice.dao.bean.KuwoKBean;
 import com.gdky005.padservice.dao.bean.KuwoProgramBean;
+import com.gdky005.padservice.dao.callback.ProgramKListCallback;
 import com.gdky005.padservice.dao.callback.ProgramListCallback;
 import com.gdky005.padservice.dao.callback.ProgramMusicDataCallback;
 
@@ -72,7 +75,7 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
         });
     }
 
-    @UiThreadTest
+    @LargeTest
     public void testgetMXRJList() {
         KuwoDao kuwoDao = new KuwoDao();
 
@@ -84,6 +87,21 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
 
             @Override
             public void onResponse(KuwoProgramBean response) {
+                System.out.println("获取的音频是：" + response.getMusiclist().get(0).getName());
+            }
+        });
+    }
+
+    public void testGetMXRJK() {
+        KuwoDao kuwoDao = new KuwoDao();
+        kuwoDao.getMXRJList(new ProgramKListCallback() {
+            @Override
+            public void onError(Call call, Exception e) {
+                System.out.println("发生错误了：" + e.getMessage());
+            }
+
+            @Override
+            public void onResponse(KuwoKBean response) {
                 System.out.println("获取的音频是：" + response.getMusiclist().get(0).getName());
             }
         });

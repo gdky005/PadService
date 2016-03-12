@@ -10,15 +10,15 @@ public enum KuwoProgramEmnu {
     /**
      * 酷我音乐调频
      */
-    KWYYTP(1013437783),
+    KWYYTP(5),
     /**
      * 莫萱日记
      */
-    MXRJ(1013437787),
+    MXRJ(2),
     /**
      * 吐小槽扒新闻
      */
-    TXCBXW(1013437785);
+    TXCBXW(1);
 
     private int value;
 

@@ -10,7 +10,7 @@ import android.text.TextUtils;
 
 import com.gdky005.padservice.PadApplication;
 import com.gdky005.padservice.dao.bean.KuwoBean;
-import com.gdky005.padservice.dao.bean.KuwoProgramBean;
+import com.gdky005.padservice.dao.bean.KuwoKBean;
 import com.gdky005.padservice.emnu.KuwoProgramEmnu;
 import com.gdky005.padservice.utils.KuwoDataUtils;
 import com.gdky005.padservice.utils.L;
@@ -102,7 +102,7 @@ public class PadService extends BaseService implements LivePlayerManager.OnLiveE
      * @param musiclistEntity
      */
     @Subscriber(tag = KuwoDataUtils.ONE_NOTIFICATION_ONCE_REQUEST_FLAG)
-    public synchronized void getRequestData(KuwoProgramBean musiclistEntity) {
+    public synchronized void getRequestData(KuwoKBean musiclistEntity) {
         if (requestCount <= KuwoProgramEmnu.values().length) {
 
             if (KuwoProgramEmnu.values().length == ++requestCount) {
@@ -136,8 +136,8 @@ public class PadService extends BaseService implements LivePlayerManager.OnLiveE
     private void playMusic() {
         mp3BeanMap = sortMp3Address();
 
-        if (mp3BeanMap != null && mp3BeanMap.size() >= ++currentProgram) {
-            KuwoBean kuwoBean = (KuwoBean) mp3BeanMap.get(currentProgram);
+        if (mp3BeanMap != null && mp3BeanMap.size() > currentProgram) {
+            KuwoBean kuwoBean = (KuwoBean) mp3BeanMap.get(currentProgram++);
             if (kuwoBean != null && !TextUtils.isEmpty(kuwoBean.getUrl())) {
                 playMusic(kuwoBean.getUrl());
             } else {

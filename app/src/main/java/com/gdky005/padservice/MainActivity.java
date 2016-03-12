@@ -31,6 +31,8 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
         connection = new PadServiceConnection();
 
+
+
         ToastUtils.showToast(this, "请设置定时时间，将在指定时间为您播放节目");
     }
 

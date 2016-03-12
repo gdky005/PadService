@@ -5,8 +5,8 @@ import android.content.Context;
 import com.gdky005.padservice.dao.KuwoDao;
 import com.gdky005.padservice.dao.bean.KuwoBean;
 import com.gdky005.padservice.dao.bean.KuwoDataBean;
-import com.gdky005.padservice.dao.bean.KuwoProgramBean;
-import com.gdky005.padservice.dao.callback.ProgramListCallback;
+import com.gdky005.padservice.dao.bean.KuwoKBean;
+import com.gdky005.padservice.dao.callback.ProgramKListCallback;
 import com.gdky005.padservice.dao.callback.ProgramMusicDataCallback;
 
 import org.simple.eventbus.EventBus;
@@ -39,22 +39,24 @@ public class KuwoDataUtils {
     }
 
     public void initRequestData() {
-        ProgramListCallback programListCallback = new ProgramListCallback() {
+
+        ProgramKListCallback programListCallback = new ProgramKListCallback() {
             @Override
             public void onError(Call call, Exception e) {
                 L.e("错误信息是：" + e);
             }
 
             @Override
-            public void onResponse(KuwoProgramBean response) {
-
+            public void onResponse(KuwoKBean response) {
                 L.json(response.toString());
 
-                //只获取最新的
-                String albumId = String.valueOf(response.getMusiclist().get(0).getId());
-                String name = String.valueOf(response.getId());
 
-                KuwoProgramBean.MusiclistEntity musicEntity = response.getMusiclist().get(0);
+                //只获取最新的
+                String albumId = response.getMusiclist().get(0).getMusicrid();
+
+                String name = String.valueOf(response.getProgramId());
+
+                KuwoKBean.MusiclistEntity musicEntity = response.getMusiclist().get(0);
 
                 if (!idMaps.containsKey(name)) {
                     idMaps.put(name, musicEntity);
@@ -77,9 +79,9 @@ public class KuwoDataUtils {
 
             while (keys.hasNext()) {
                 String programId = keys.next(); // 代表id
-                KuwoProgramBean.MusiclistEntity musiclistEntity = (KuwoProgramBean.MusiclistEntity)
-                        idMaps.get(programId); //数据实体
-                String albumId = musiclistEntity.getId(); // 代表id
+                KuwoKBean.MusiclistEntity musiclistEntity =
+                        (KuwoKBean.MusiclistEntity) idMaps.get(programId); //数据实体
+                String albumId = musiclistEntity.getMusicrid(); // 代表id
 
                 L.i("获取的音频数据是：programId->{}, 节目id->{}, 数据实体->{}",
                         programId, albumId,
@@ -90,9 +92,9 @@ public class KuwoDataUtils {
         }
     }
 
-    private void requestProgramData(String programId, KuwoProgramBean.MusiclistEntity musiclistEntity) {
+    private void requestProgramData(String programId, KuwoKBean.MusiclistEntity musiclistEntity) {
         L.i("发起请求：programId->{}",programId);
-        kuwoDao.getProgramData(programId, musiclistEntity.getId(), new ProgramMusicDataCallback() {
+        kuwoDao.getProgramData(programId, musiclistEntity.getMusicrid(), new ProgramMusicDataCallback() {
             @Override
             public void onError(Call call, Exception e) {
                 L.e("获取数据失败");

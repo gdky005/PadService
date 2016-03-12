@@ -70,15 +70,22 @@ public class KuwoDao extends BaseDao {
 
         GetBuilder builder = new GetBuilder()
                 .url(url)
-                .addParams("pid", programEmnu.toString())
-                .addParams("op", "getlistinfo")
+                .addParams("flag", "2")
+                .addParams("listid", programEmnu.toString())
                 .addParams("pn", "0")
-                .addParams("rn", "2")   //只获取最近两条
-                .addParams("encode", CHARSET_NAME)
-                .addParams("keyset", "pl2012")
-                .addParams("indentity", "kuwo")
-                .addParams("callback", "json")
-                .addParams("r", String.valueOf(System.currentTimeMillis()));
+                .addParams("rn", "2");  //只获取最近的数据
+//
+//       GetBuilder builder = new GetBuilder()
+//                .url(url)
+//                .addParams("pid", programEmnu.toString())
+//                .addParams("op", "getlistinfo")
+//                .addParams("pn", "0")
+//                .addParams("rn", "2")   //只获取最近两条
+//                .addParams("encode", CHARSET_NAME)
+//                .addParams("keyset", "pl2012")
+//                .addParams("indentity", "kuwo")
+//                .addParams("callback", "json")
+//                .addParams("r", String.valueOf(System.currentTimeMillis()));
         return builder;
     }
 
