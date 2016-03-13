@@ -31,6 +31,8 @@ public class PadApplication extends Application {
         mOkHttpUtils.debug(getString(R.string.app_name));
 
         okHttpClient = mOkHttpUtils.getOkHttpClient();
+        okHttpClient.newBuilder().retryOnConnectionFailure(true);
+        okHttpClient.newBuilder().followRedirects(true);
         okHttpClient.newBuilder().connectTimeout(15000, TimeUnit.MILLISECONDS);
         okHttpClient.newBuilder().readTimeout(15000, TimeUnit.MILLISECONDS);
         okHttpClient.newBuilder().writeTimeout(15000, TimeUnit.MILLISECONDS);

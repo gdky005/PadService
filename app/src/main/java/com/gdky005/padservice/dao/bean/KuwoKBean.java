@@ -1,15 +1,11 @@
 package com.gdky005.padservice.dao.bean;
 
-import android.os.Parcel;
-import android.os.Parcelable;
-
-import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Created by WangQing on 16/3/12.
  */
-public class KuwoKBean implements Parcelable {
+public class KuwoKBean {
     /**
      * ret : ok
      * total : 746
@@ -62,7 +58,7 @@ public class KuwoKBean implements Parcelable {
         return musiclist;
     }
 
-    public static class MusiclistEntity {
+    public static class MusiclistEntity extends KuwoBean {
         private String yr;
         private String musicrid;
         private String name;
@@ -118,38 +114,4 @@ public class KuwoKBean implements Parcelable {
             return formats;
         }
     }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(this.ret);
-        dest.writeInt(this.total);
-        dest.writeInt(this.programId);
-        dest.writeList(this.musiclist);
-    }
-
-    public KuwoKBean() {
-    }
-
-    protected KuwoKBean(Parcel in) {
-        this.ret = in.readString();
-        this.total = in.readInt();
-        this.programId = in.readInt();
-        this.musiclist = new ArrayList<MusiclistEntity>();
-        in.readList(this.musiclist, List.class.getClassLoader());
-    }
-
-    public static final Parcelable.Creator<KuwoKBean> CREATOR = new Parcelable.Creator<KuwoKBean>() {
-        public KuwoKBean createFromParcel(Parcel source) {
-            return new KuwoKBean(source);
-        }
-
-        public KuwoKBean[] newArray(int size) {
-            return new KuwoKBean[size];
-        }
-    };
 }

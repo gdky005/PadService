@@ -9,7 +9,6 @@ import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import com.gdky005.padservice.PadApplication;
-import com.gdky005.padservice.dao.bean.KuwoBean;
 import com.gdky005.padservice.dao.bean.KuwoKBean;
 import com.gdky005.padservice.emnu.KuwoProgramEmnu;
 import com.gdky005.padservice.utils.KuwoDataUtils;
@@ -51,6 +50,7 @@ public class PadService extends BaseService implements LivePlayerManager.OnLiveE
         super.onCreate();
         EventBus.getDefault().register(this);
         mLivePlayerManager = LivePlayerManager.getInstance(this);
+        mLivePlayerManager.addLiveEndListener(this);
     }
 
     @Override
@@ -58,9 +58,7 @@ public class PadService extends BaseService implements LivePlayerManager.OnLiveE
         log("onStartCommand");
         kuwoDataUtils = new KuwoDataUtils(context);
 
-        requestCount = 0;
-        mp3Count = 0;
-        currentProgram = 0;
+        resetCount();
 
         context = PadApplication.getContext();
 
@@ -74,6 +72,12 @@ public class PadService extends BaseService implements LivePlayerManager.OnLiveE
 
         //保证服务不被杀死
         return Service.START_STICKY;
+    }
+
+    private void resetCount() {
+        requestCount = 0;
+        mp3Count = 0;
+        currentProgram = 0;
     }
 
     private void testPlayData() {
@@ -92,9 +96,9 @@ public class PadService extends BaseService implements LivePlayerManager.OnLiveE
 
     @Subscriber(tag = NOTIFICATION_SUCCESS_PLAY_MUSIC_FLAG)
     private synchronized void preparePlayMusic(boolean isPlay) {
+        resetCount();
         kuwoDataUtils.initRequestData();
     }
-
 
 
     /**
@@ -117,7 +121,7 @@ public class PadService extends BaseService implements LivePlayerManager.OnLiveE
     }
 
     @Subscriber(tag = KuwoDataUtils.ONE_NOTIFICATION_FOR_ONCE_MUSIC_DATA_FLAG)
-    public synchronized void getMp3Map(KuwoBean kuwoBean) {
+    public synchronized void getMp3Map(KuwoKBean.MusiclistEntity kuwoBean) {
 
         if (mp3Count <= KuwoProgramEmnu.values().length) {
 
@@ -137,10 +141,16 @@ public class PadService extends BaseService implements LivePlayerManager.OnLiveE
     private void playMusic() {
         mp3BeanMap = sortMp3Address();
 
-        if (mp3BeanMap != null && mp3BeanMap.size() > currentProgram) {
-            KuwoBean kuwoBean = (KuwoBean) mp3BeanMap.get(currentProgram++);
+        if (currentProgram == mp3BeanMap.size()) {
+            currentProgram = 0;
+            L.i("播放列表已经播完");
+            NotifyUtils.showNotify(context, "今日已经播完", "暂无内容", "请期待明日播单");
+        }
+
+        if (mp3BeanMap != null) {
+            KuwoKBean.MusiclistEntity kuwoBean = (KuwoKBean.MusiclistEntity) mp3BeanMap.get(currentProgram++);
             if (kuwoBean != null && !TextUtils.isEmpty(kuwoBean.getUrl())) {
-                playMusic(kuwoBean.getUrl());
+                playMusic(kuwoBean);
             } else {
                 mLivePlayerManager.reset();
                 L.i("播放列表已经播完");
@@ -154,9 +164,10 @@ public class PadService extends BaseService implements LivePlayerManager.OnLiveE
         }
     }
 
-    private void playMusic(String url) {
-        NotifyUtils.showNotify(context, "正在播放", "播放音频中", "");
-        mLivePlayerManager.start(url);
+    private void playMusic(KuwoKBean.MusiclistEntity kuwoBean) {
+        L.i("酷我音频数据:当前真正播放的节目是：{}，音频地址是：{}", kuwoBean.getName(), kuwoBean.getUrl());
+        NotifyUtils.showNotify(context, kuwoBean.getName(), kuwoBean.getArtist(), kuwoBean.getAlbum());
+        mLivePlayerManager.start(kuwoBean.getUrl());
     }
 
     private Map sortMp3Address() {
@@ -169,12 +180,13 @@ public class PadService extends BaseService implements LivePlayerManager.OnLiveE
 
             while (keys.hasNext()) {
                 String programId = keys.next(); // 代表id
-                KuwoBean kuwoBean = (KuwoBean) mp3Map.get(programId);
+                KuwoKBean.MusiclistEntity kuwoBean = (KuwoKBean.MusiclistEntity) mp3Map.get(programId);
                 String albumId = kuwoBean.getMid(); // 代表id
                 String url = kuwoBean.getUrl();
+                String name = kuwoBean.getName();
 
-                L.i("酷我音频数据是：programId->{}, 节目id->{}, 音频->{}",
-                        programId, albumId, url);
+                L.i("酷我音频数据是：programId->{}, 节目id->{}, 音频名字是->{}，音频地址是->{}",
+                        programId, albumId, name, url);
 
                 //对酷我音频的id进行个性化排序
                 for (int i = 0; i < KuwoProgramEmnu.values().length; i++) {

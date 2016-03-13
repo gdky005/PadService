@@ -12,7 +12,7 @@ public class BaseDao {
     /**
      * 格式分为：mp3 和 aac
      */
-    public final String FORMAT_FIELD = "mp3";
+    public final String FORMAT_FIELD = "aac";
     public final String CHARSET_NAME = "UTF-8";
 
 

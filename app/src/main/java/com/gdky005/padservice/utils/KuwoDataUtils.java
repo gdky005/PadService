@@ -3,7 +3,6 @@ package com.gdky005.padservice.utils;
 import android.content.Context;
 
 import com.gdky005.padservice.dao.KuwoDao;
-import com.gdky005.padservice.dao.bean.KuwoBean;
 import com.gdky005.padservice.dao.bean.KuwoDataBean;
 import com.gdky005.padservice.dao.bean.KuwoKBean;
 import com.gdky005.padservice.dao.callback.ProgramKListCallback;
@@ -70,6 +69,8 @@ public class KuwoDataUtils {
         kuwoDao.getKWYYTPList(programListCallback);
         kuwoDao.getMXRJList(programListCallback);
         kuwoDao.getTXCBXWList(programListCallback);
+
+
     }
 
     public void getMp3AddressForMap() {
@@ -92,7 +93,7 @@ public class KuwoDataUtils {
         }
     }
 
-    private void requestProgramData(String programId, KuwoKBean.MusiclistEntity musiclistEntity) {
+    private void requestProgramData(String programId, final KuwoKBean.MusiclistEntity musiclistEntity) {
         L.i("发起请求：programId->{}",programId);
         kuwoDao.getProgramData(programId, musiclistEntity.getMusicrid(), new ProgramMusicDataCallback() {
             @Override
@@ -112,14 +113,13 @@ public class KuwoDataUtils {
                         .getProgramId(), response
                         .getUrl());
 
-                KuwoBean kuwoBean = new KuwoBean();
-                kuwoBean.setMid(mid);
-                kuwoBean.setProgramId(programId);
-                kuwoBean.setUrl(url);
+                musiclistEntity.setMid(mid);
+                musiclistEntity.setUrl(url);
+                musiclistEntity.setProgramId(programId);
 
-                mp3Map.put(programId, kuwoBean);
+                mp3Map.put(programId, musiclistEntity);
 
-                EventBus.getDefault().post(kuwoBean, ONE_NOTIFICATION_FOR_ONCE_MUSIC_DATA_FLAG);
+                EventBus.getDefault().post(musiclistEntity, ONE_NOTIFICATION_FOR_ONCE_MUSIC_DATA_FLAG);
 
 //                        03-08 18:59:48.562 I: ║ 当前获取的音频: mid->6958190, programe->1013437787, 地址是：http://other.web.rh01.sycdn.kuwo.cn/f743cf9dfd8b5c7926d3cb8fa417713b/56deb09e/resource/n1/94/66/3900324722.mp3
 //                        03-08 18:59:48.565 I: ║ 当前获取的音频: mid->6951198, programe->1013437783, 地址是：http://other.web.rh01.sycdn.kuwo.cn/42c666014fca3adbb9f0131eb4699d12/56deb09e/resource/n1/9/6/248073288.mp3

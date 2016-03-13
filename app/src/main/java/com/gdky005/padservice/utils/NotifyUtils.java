@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.support.v4.app.NotificationCompat;
 
 import com.gdky005.padservice.MainActivity;
+import com.gdky005.padservice.PadApplication;
 import com.gdky005.padservice.R;
 
 /**
@@ -25,6 +26,10 @@ public class NotifyUtils {
      */
     public static void showNotify(Context context, String title, String contextText, String subText) {
         long time = System.currentTimeMillis();
+
+        if (context == null) {
+            context = PadApplication.getContext();
+        }
 
 //        title = "默认标题";
 //        contextText = "默认内容";

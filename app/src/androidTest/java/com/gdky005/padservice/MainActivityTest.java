@@ -22,6 +22,9 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2 {
         super(MainActivity.class);
     }
 
+    /**
+     * 用于快速自动设置闹钟
+     */
     public void testAlarm() {
         long time = System.currentTimeMillis();
         SimpleDateFormat formatH = new SimpleDateFormat("HH");

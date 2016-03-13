@@ -14,8 +14,11 @@ import android.view.View;
 import com.gdky005.padservice.dao.bean.TimeBean;
 import com.gdky005.padservice.service.PadService;
 import com.gdky005.padservice.utils.AlarmUtils;
+import com.gdky005.padservice.utils.L;
 import com.gdky005.padservice.utils.ServiceIntent;
 import com.gdky005.padservice.utils.ToastUtils;
+
+import java.text.SimpleDateFormat;
 
 public class MainActivity extends Activity implements View.OnClickListener {
 
@@ -34,6 +37,34 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
 
         ToastUtils.showToast(this, "请设置定时时间，将在指定时间为您播放节目");
+    }
+
+    private void testData() {
+        bind();
+        start();
+
+        long time = System.currentTimeMillis();
+        SimpleDateFormat formatH = new SimpleDateFormat("HH");
+        SimpleDateFormat formatM = new SimpleDateFormat("mm");
+        SimpleDateFormat formatS = new SimpleDateFormat("ss");
+        int h = Integer.parseInt(formatH.format(time));
+        int m = Integer.parseInt(formatM.format(time));
+        int s = Integer.parseInt(formatS.format(time));
+
+        if (s == 56) {
+            s = 55;
+        }
+
+        if (m == 60) {
+            m = 0;
+        }
+
+
+//        L.i("当前的时间是：{}时{}分{}秒", h, m, s);
+//        s+=5;
+        s++;
+        L.i("当前的设置闹钟时间是：{}时{}分{}秒", h, m, s);
+        AlarmUtils.startAlarm(this, 60 * 1000, h, m, s);
     }
 
     private class PadServiceConnection implements ServiceConnection {
