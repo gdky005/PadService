@@ -30,6 +30,16 @@ public class KuwoDao extends BaseDao {
     }
 
     /**
+     * 获取 爆笑糗事段子 的列表
+     * @param callback
+     */
+    public void getBXQSDZList(Callback callback) {
+        GetBuilder builder = getKuwoParmasBuilder(KuwoProgramEmnu.BXQSDZ);
+
+        addRequest(builder, callback);
+    }
+
+    /**
      * 获取吐小槽扒新闻的列表
      *
      * @param callback

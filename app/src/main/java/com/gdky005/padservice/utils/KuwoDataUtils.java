@@ -66,6 +66,7 @@ public class KuwoDataUtils {
             }
         };
 
+        kuwoDao.getBXQSDZList(programListCallback);
         kuwoDao.getKWYYTPList(programListCallback);
         kuwoDao.getMXRJList(programListCallback);
         kuwoDao.getTXCBXWList(programListCallback);

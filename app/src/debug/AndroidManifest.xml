@@ -1,0 +1,10 @@
+<manifest
+    package="com.gdky005.padservice"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <application
+        tools:replace="android:name"
+        android:name=".MyPadApplication"/>
+
+</manifest>
